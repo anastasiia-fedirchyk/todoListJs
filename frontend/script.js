@@ -1,18 +1,18 @@
 const listCountElement = document.querySelector("[data-list-count]");
 const tasksContainer = document.querySelector("[data-tasks]");
-const taskTemplate = document.getElementById('task-template')
-const newTaskInput = document.querySelector('[data-new-task-input]')
-const newTaskButton = document.getElementById("btn-task")
-const clearCompletedButton = document.getElementById("btn-delete")
-
+const taskTemplate = document.getElementById('task-template');
+const newTaskInput = document.querySelector('[data-new-task-input]');
+const newTaskButton = document.getElementById("btn-task");
+const clearCompletedButton = document.getElementById("btn-delete");
+const baseUrl = "http://localhost:8000/api";
 
 window.addEventListener("load", getAndRenderTasks);
 newTaskButton.addEventListener("click", createTask);
-clearCompletedButton.addEventListener("click", deleteCompletedTasks)
+clearCompletedButton.addEventListener("click", deleteCompletedTasks);
 
 
 function getAndRenderTasks() {
-    axios.get("http://localhost:8000/api/record")
+    axios.get(`${baseUrl}/record`)
         .then(response => {
             renderTasks(response.data);
             countUnfinishedTasks();
@@ -22,60 +22,60 @@ function getAndRenderTasks() {
 
 function renderTasks(tasks) {
     tasks.forEach(task => {
-        addNewTask(task)
+        addNewTask(task);
     })
 }
 
 function addNewTask(task) {
-
-    const taskElement = document.importNode(taskTemplate.content, true)
-    const item = taskElement.querySelector(".collection-item")
-    item.id = task.record_id
-    item.completed = task.completed
-    item.querySelector("span").innerText = task.name
-    taskElement.querySelector("#finish").addEventListener("click", finishTask)
-    taskElement.querySelector("#delete").addEventListener("click", deleteTask)
-    tasksContainer.appendChild(taskElement)
+    const taskElement = document.importNode(taskTemplate.content, true);
+    const item = taskElement.querySelector(".collection-item");
+    item.id = task.record_id;
+    item.completed = task.completed;
+    item.querySelector("span").innerText = task.name;
+    taskElement.querySelector("#finish").addEventListener("click", finishTask);
+    taskElement.querySelector("#delete").addEventListener("click", deleteTask);
+    tasksContainer.appendChild(taskElement);
     if (task.completed) {
-        item.querySelector("span").style.textDecoration = "line-through"
+        item.querySelector("span").style.textDecoration = "line-through";
     }
-    countUnfinishedTasks()
+    countUnfinishedTasks();
 }
 
 
 function createTask(event) {
-    const taskName = newTaskInput.value
-    if (!taskName || taskName.trim() === '') return
+    const taskName = newTaskInput.value;
+    if (!taskName || taskName.trim() === '') return;
     event.preventDefault();
     const task = {name: newTaskInput.value, completed: false};
-    axios.post('http://localhost:8000/api/record', task)
+    axios.post(`${baseUrl}/record`, task)
         .then(response => {
-            addNewTask(response.data)
-            newTaskInput.value = null
+            addNewTask(response.data);
+            newTaskInput.value = null;
         })
 }
 
 function sendFinishTaskRequest(event) {
     event.preventDefault();
-    let id = event.currentTarget.parentElement.parentElement.id
-    let name = event.currentTarget.parentElement.parentElement.querySelector("span").innerText
+    let id = event.currentTarget.parentElement.parentElement.id;
+    let name = event.currentTarget.parentElement.parentElement.querySelector("span").innerText;
     const task = {name: name, completed: true};
 
-    axios.put(`http://localhost:8000/api/record/${id}`, task)
-        .then(response => console.log(response.data));
+    axios.put(`${baseUrl}/record/${id}`, task)
+.
+    then(response => console.log(response.data));
 
 }
 
 function sendDeleteTaskRequest(id) {
-    axios.delete(`http://localhost:8000/api/record/${id}`)
+    axios.delete(`${baseUrl}/record/${id}`)
         .then(response => console.log(response.data));
 }
 
 function finishTask(event) {
     event.preventDefault();
-    sendFinishTaskRequest(event)
-    event.currentTarget.parentElement.parentElement.querySelector("span").style.textDecoration = "line-through"
-    countUnfinishedTasks()
+    sendFinishTaskRequest(event);
+    event.currentTarget.parentElement.parentElement.querySelector("span").style.textDecoration = "line-through";
+    countUnfinishedTasks();
 
 }
 
